@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdqn.dao.StudentMapper">
+
+        <resultMap id="studentMap" type="Student">
+            <id column="id" property="id"/>
+            <result property="studentNum" column="student_num"/>
+            <result property="studentName" column="student_name"/>
+            <result property="gender" column="gender"/>
+            <result property="age" column="age"/>
+            <association property="grade" resultMap="gradeMap"></association>
+        </resultMap>
+
+        <resultMap id="gradeMap" type="Grade">
+            <id column="g_id" property="id"></id>
+            <result property="gradeName" column="grade_name"/>
+        </resultMap>
+
+        <!--1.查询所有学生信息-->
+        <select id="queryAll" resultMap="studentMap">
+            SELECT s.*,g.id g_id,g.grade_name
+            FROM student s,grade g
+            WHERE
+            s.grade_id=g.id
+            ORDER BY
+            s.id DESC
+        </select>
+
+        <!--2.批量删除学生-->
+        <delete id="deleteStudentByIds">
+            delete from student where id IN
+            <foreach collection="list" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </delete>
+
+        <!--3.添加学生信息-->
+        <insert id="addStudent" parameterType="Student">
+            INSERT INTO student
+            VALUES
+            (NULL,#{grade.id},#{studentName},#{gender},#{age},#{studentNum})
+        </insert>
+
+        <!--4.通过id查询学生-->
+        <select id="queryStudentById" parameterType="Integer" resultMap="studentMap">
+            SELECT s.*,g.id g_id,g.grade_name
+            FROM student s,grade g
+            WHERE
+            s.grade_id=g.id
+            AND
+            s.id=#{id}
+        </select>
+
+        <!--5.修改学生-->
+        <update id="updateStudent" parameterType="Student">
+            UPDATE student
+            SET grade_id=#{grade.id},
+            student_name=#{studentName},
+            gender=#{gender},
+            age=#{age}
+            WHERE
+            id=#{id}
+        </update>
+</mapper>

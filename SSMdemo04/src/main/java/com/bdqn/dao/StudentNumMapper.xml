@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdqn.dao.StudentNumMapper">
+
+    <!--1.添加学生编号-->
+    <insert id="addStudentNum" parameterType="Integer">
+         INSERT INTO student_num
+         VALUES
+         (NULL,#{gradeId},0)
+    </insert>
+    <!--2.修改学员所在班的最大学员编号-->
+    <update id="updateMaxNumByGradeId" parameterType="Integer">
+        UPDATE student_num
+        SET max_num=max_num+1
+        where
+        grade_id=#{gradeId}
+    </update>
+    <!--3.查询学员所在班的最大学员编号-->
+    <select id="queryMaxNumByGradeId" parameterType="Integer" resultType="Integer">
+        SELECT
+        max_num
+        FROM student_num
+        WHERE
+        grade_id=#{gradeId}
+    </select>
+
+</mapper>

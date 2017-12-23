@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 加载数据库配置文件 -->
+    <context:property-placeholder location="classpath:database.properties"></context:property-placeholder>
+    <!--
+    	使spring扫描包下的所有类，让标注spring注解的类生效
+    	若扫描到有@Component @Controller @Service等这些注解的类，则把这些类注册为bean
+    -->
+    <context:component-scan base-package="com.bdqn.service"></context:component-scan>
+
+    <!--JNDI获取数据源（使用dbcp数据库连接池）-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url"              value="${jdbc.url}"/>
+        <property name="username"         value="${jdbc.username}"/>
+        <property name="password"         value="${jdbc.password}"/>
+    </bean>
+
+    <!-- mapper配置  配置拦截器插件 -->
+    <!-- 让spring管理sqlsessionfactory 使用mybatis和spring整合 -->
+    <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据库连接池 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 加载mybatis的全局配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <!--使用下面的方式配置参数，一行配置一个 -->
+                        <value>
+                            <!--你可以配置helperDialect属性来指定分页插件使用哪种方言-->
+                            helperDialect=mysql
+                            <!--分页分页合理化参数，默认值为false。
+                            当该参数设置为 true 时，pageNum<=0 时会查询第一页，
+                                                    pageNum>pages（超过总数时），会查询最后一页。
+                                                    默认false 时，直接根据参数进行查询-->
+                            reasonable=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <!-- 配置Mapper映射扫描器 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.bdqn.dao"></property>
+    </bean>
+
+</beans>
